@@ -1,0 +1,6 @@
+{
+  "name": "Interactive Double Slit Experiment",
+  "description": "A fully interactive web-based visualization of the quantum mechanical double-slit experiment using React Three Fiber. The application demonstrates wave-particle duality with real-time parameter adjustment and physically accurate calculations.",
+  "requestFramePermissions": [],
+  "prompt": ""
+}
