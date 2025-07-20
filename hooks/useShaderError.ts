@@ -7,6 +7,37 @@ interface ShaderErrorInfo {
   type: 'vertex' | 'fragment' | null;
 }
 
+/**
+ * Custom hook that monitors a Three.js ShaderMaterial for compilation errors.
+ * Useful for debugging GLSL shader issues during development.
+ * 
+ * @param material - Three.js ShaderMaterial to monitor, or null
+ * @returns Object containing:
+ *   - hasError: Whether a shader compilation error was detected
+ *   - error: The error message if any, null otherwise
+ *   - type: Which shader type failed ('vertex', 'fragment', or null)
+ * 
+ * @example
+ * ```typescript
+ * const material = new THREE.ShaderMaterial({
+ *   vertexShader: myVertexShader,
+ *   fragmentShader: myFragmentShader,
+ *   uniforms: myUniforms
+ * });
+ * 
+ * const { hasError, error, type } = useShaderError(material);
+ * 
+ * if (hasError) {
+ *   console.error(`${type} shader error:`, error);
+ * }
+ * ```
+ * 
+ * @remarks
+ * - Creates a temporary WebGL context to test shader compilation
+ * - Automatically cleans up the test renderer to prevent memory leaks
+ * - Runs compilation check whenever the material reference changes
+ * - Useful for providing user-friendly error messages in development
+ */
 export const useShaderError = (material: THREE.ShaderMaterial | null): ShaderErrorInfo => {
   const [errorInfo, setErrorInfo] = useState<ShaderErrorInfo>({
     hasError: false,
@@ -84,7 +115,45 @@ export const useShaderError = (material: THREE.ShaderMaterial | null): ShaderErr
   return errorInfo;
 };
 
-// Helper to create shader material with error handling
+/**
+ * Helper function to create a Three.js ShaderMaterial with built-in error handling.
+ * Tests shader compilation before returning the material.
+ * 
+ * @param vertexShader - GLSL vertex shader source code
+ * @param fragmentShader - GLSL fragment shader source code
+ * @param uniforms - Shader uniform variables as Three.js IUniform objects
+ * @param options - Additional ShaderMaterial parameters (optional)
+ * 
+ * @returns The compiled ShaderMaterial if successful, null if compilation fails
+ * 
+ * @example
+ * ```typescript
+ * const material = createShaderMaterial(
+ *   vertexShaderSource,
+ *   fragmentShaderSource,
+ *   {
+ *     time: { value: 0 },
+ *     color: { value: new THREE.Color(0xff0000) },
+ *     amplitude: { value: 1.0 }
+ *   },
+ *   {
+ *     transparent: true,
+ *     side: THREE.DoubleSide
+ *   }
+ * );
+ * 
+ * if (!material) {
+ *   console.error('Shader compilation failed');
+ *   // Use fallback material
+ * }
+ * ```
+ * 
+ * @remarks
+ * - Performs a test compilation in a temporary WebGL context
+ * - Logs detailed error messages to console if compilation fails
+ * - Automatically disposes of test resources to prevent memory leaks
+ * - Returns null instead of throwing to allow graceful error handling
+ */
 export const createShaderMaterial = (
   vertexShader: string,
   fragmentShader: string,

@@ -1,6 +1,43 @@
 import { useEffect, useRef, useState } from 'react';
 import type { AnimationConfig, AnimationState, AnimationControls } from '../types/interfaces';
 
+/**
+ * Custom hook that manages a pausable animation loop with adjustable time scaling.
+ * Provides simulation time that can be paused, resumed, and scaled independently
+ * of wall-clock time.
+ * 
+ * @param config - Animation configuration object containing:
+ *   - isPaused: Whether the animation is currently paused
+ *   - timeScale: Multiplier for simulation time progression (1.0 = real-time)
+ * 
+ * @returns Object containing:
+ *   - simulationTime: Current simulation time in seconds
+ *   - resetTime: Function to reset simulation time to 0
+ * 
+ * @example
+ * ```typescript
+ * // Basic usage
+ * const { simulationTime, resetTime } = useAnimationLoop({
+ *   isPaused: false,
+ *   timeScale: 1.0
+ * });
+ * 
+ * // Use in a physics simulation
+ * const wavePhase = simulationTime * waveFrequency;
+ * 
+ * // Slow motion effect
+ * const { simulationTime } = useAnimationLoop({
+ *   isPaused: false,
+ *   timeScale: 0.5  // Half speed
+ * });
+ * ```
+ * 
+ * @remarks
+ * - Uses requestAnimationFrame for smooth 60fps updates
+ * - Automatically handles pause/unpause without time jumps
+ * - Time scale changes take effect immediately
+ * - Simulation time is preserved across re-renders
+ */
 export const useAnimationLoop = (config: AnimationConfig): AnimationState & AnimationControls => {
   const [simulationTime, setSimulationTime] = useState(0);
   const timeRef = useRef({ simTime: 0, lastTimestamp: 0 });

@@ -6,6 +6,45 @@ interface ContextLossHandlers {
   onContextRestored?: () => void;
 }
 
+/**
+ * Custom hook that monitors and handles WebGL context loss/restoration events.
+ * Provides callbacks for gracefully handling GPU crashes or context resets.
+ * 
+ * @param handlers - Optional callback functions:
+ *   - onContextLost: Called when WebGL context is lost
+ *   - onContextRestored: Called when WebGL context is restored
+ * 
+ * @example
+ * ```typescript
+ * function MyScene() {
+ *   const [needsReset, setNeedsReset] = useState(false);
+ *   
+ *   useWebGLContextLoss({
+ *     onContextLost: () => {
+ *       console.warn('WebGL context lost - saving state...');
+ *       setNeedsReset(true);
+ *     },
+ *     onContextRestored: () => {
+ *       console.log('WebGL context restored - reinitializing...');
+ *       // Recreate textures, buffers, etc.
+ *       setNeedsReset(false);
+ *     }
+ *   });
+ * 
+ *   if (needsReset) {
+ *     return <div>Graphics context lost. Attempting recovery...</div>;
+ *   }
+ * 
+ *   return <Canvas>...</Canvas>;
+ * }
+ * ```
+ * 
+ * @remarks
+ * - Automatically prevents default browser behavior on context loss
+ * - Handlers are stored in refs to avoid re-registering listeners
+ * - Includes commented debug code to force context loss for testing
+ * - Essential for production apps to handle GPU driver crashes gracefully
+ */
 export const useWebGLContextLoss = (handlers?: ContextLossHandlers) => {
   const { gl } = useThree();
   const handlersRef = useRef(handlers);
@@ -58,7 +97,32 @@ export const useWebGLContextLoss = (handlers?: ContextLossHandlers) => {
   }, [gl]);
 };
 
-// Hook to monitor WebGL memory usage
+/**
+ * Development hook that monitors WebGL memory usage and renderer information.
+ * Logs GPU details and memory statistics periodically in development mode.
+ * 
+ * @example
+ * ```typescript
+ * function MyApp() {
+ *   // Only runs in development mode
+ *   useWebGLMemoryMonitor();
+ *   
+ *   return <Canvas>...</Canvas>;
+ * }
+ * ```
+ * 
+ * @remarks
+ * - Only active in development mode (NODE_ENV === 'development')
+ * - Logs GPU vendor and renderer info on mount
+ * - Logs memory usage (geometries, textures, programs) every 30 seconds
+ * - Useful for detecting memory leaks during development
+ * - Automatically cleans up interval on unmount
+ * 
+ * Memory info includes:
+ * - Number of geometries in memory
+ * - Number of textures in memory
+ * - Number of shader programs compiled
+ */
 export const useWebGLMemoryMonitor = () => {
   const { gl } = useThree();
 

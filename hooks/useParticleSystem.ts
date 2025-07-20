@@ -31,7 +31,43 @@ interface UseParticleSystemReturn extends ParticleSystemState, ParticleSystemAct
 
 /**
  * Calculates the interference intensity at a given position on the detection screen
- * using the double-slit interference formula with diffraction envelope
+ * using the double-slit interference formula with diffraction envelope.
+ * 
+ * This function implements the theoretical intensity pattern for a double-slit experiment,
+ * combining both interference effects (from the two slits) and diffraction effects
+ * (from each individual slit width).
+ * 
+ * @param posOnScreen - Position on the detection screen along the Z-axis (in micrometers)
+ * @param params - Physics parameters containing:
+ *   - wavelength: Light wavelength in micrometers
+ *   - slitSeparation: Distance between slit centers in micrometers
+ *   - screenDistance: Distance from slits to detection screen in micrometers
+ *   - slitWidth: Width of each individual slit in micrometers
+ * 
+ * @returns Normalized intensity value between 0 and 1, where:
+ *   - 1 represents maximum intensity (constructive interference)
+ *   - 0 represents minimum intensity (destructive interference)
+ * 
+ * @example
+ * ```typescript
+ * // Calculate intensity at center of screen
+ * const centerIntensity = getInterferenceIntensity(0, {
+ *   wavelength: 0.5,      // 500nm green light
+ *   slitSeparation: 2.0,  // 2μm between slits
+ *   screenDistance: 10.0, // 10μm to screen
+ *   slitWidth: 0.3        // 0.3μm wide slits
+ * });
+ * // centerIntensity ≈ 1.0 (maximum at center)
+ * ```
+ * 
+ * @remarks
+ * The physics implementation follows:
+ * - Interference term: I_interference = cos²(πd·z/λD)
+ * - Diffraction term: I_diffraction = sinc²(πw·z/λD)
+ * - Total intensity: I = I_interference × I_diffraction
+ * 
+ * Where d is slit separation, w is slit width, λ is wavelength,
+ * D is screen distance, and z is position on screen.
  */
 const getInterferenceIntensity = (posOnScreen: number, params: PhysicsParams): number => {
   const { wavelength, slitSeparation, screenDistance, slitWidth } = params;

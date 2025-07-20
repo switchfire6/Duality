@@ -12,6 +12,33 @@ interface State {
   errorType: 'webgl' | 'shader' | 'general' | null;
 }
 
+/**
+ * Error boundary component that catches and displays errors in the 3D visualization.
+ * Provides user-friendly error messages and troubleshooting steps for common issues.
+ * 
+ * @example
+ * ```typescript
+ * // Basic usage
+ * <ErrorBoundary>
+ *   <Canvas>
+ *     <Scene />
+ *   </Canvas>
+ * </ErrorBoundary>
+ * 
+ * // With custom fallback
+ * <ErrorBoundary fallback={<CustomErrorUI />}>
+ *   <DoubleSlitExperiment />
+ * </ErrorBoundary>
+ * ```
+ * 
+ * @remarks
+ * This component:
+ * - Categorizes errors as WebGL, shader, or general
+ * - Provides specific troubleshooting steps for each error type
+ * - Shows detailed stack traces in development mode
+ * - Offers reload and go back actions for recovery
+ * - Prevents the entire app from crashing due to 3D rendering issues
+ */
 class ErrorBoundary extends Component<Props, State> {
   constructor(props: Props) {
     super(props);
@@ -23,6 +50,13 @@ class ErrorBoundary extends Component<Props, State> {
     };
   }
 
+  /**
+   * Static lifecycle method that updates state when an error is caught.
+   * Analyzes the error to determine its type for appropriate user guidance.
+   * 
+   * @param error - The caught error object
+   * @returns Partial state update with error details and categorization
+   */
   static getDerivedStateFromError(error: Error): Partial<State> {
     // Determine error type based on error message
     let errorType: State['errorType'] = 'general';
@@ -41,6 +75,13 @@ class ErrorBoundary extends Component<Props, State> {
     };
   }
 
+  /**
+   * Lifecycle method called after an error is caught.
+   * Logs error details and captures component stack trace.
+   * 
+   * @param error - The caught error object
+   * @param errorInfo - React error info including component stack
+   */
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('Error caught by boundary:', error, errorInfo);
     this.setState({

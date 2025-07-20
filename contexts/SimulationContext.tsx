@@ -24,7 +24,10 @@ interface SimulationProviderProps {
   children: ReactNode;
 }
 
-// Parameter validation boundaries
+/**
+ * Parameter validation boundaries for physics simulation.
+ * Defines min/max values for each parameter to ensure physical validity.
+ */
 const PARAM_BOUNDS = {
   wavelength: { min: 0.1, max: 2.0 },
   slitSeparation: { min: 0.5, max: 10.0 },
@@ -36,7 +39,15 @@ const PARAM_BOUNDS = {
   timeScale: { min: 0.1, max: 5.0 },
 };
 
-// Validate and clamp parameter values
+/**
+ * Validates and clamps a single parameter value to its defined bounds.
+ * 
+ * @param key - The parameter name to validate
+ * @param value - The numeric value to check and clamp
+ * @returns The clamped value within valid bounds, or midpoint if invalid
+ * 
+ * @internal
+ */
 const validateParam = (key: keyof typeof PARAM_BOUNDS, value: number): number => {
   const bounds = PARAM_BOUNDS[key];
   if (!bounds) return value;
@@ -49,7 +60,15 @@ const validateParam = (key: keyof typeof PARAM_BOUNDS, value: number): number =>
   return Math.max(bounds.min, Math.min(bounds.max, value));
 };
 
-// Validate physics constraints
+/**
+ * Validates all physics parameters and enforces physical constraints.
+ * Ensures parameters are within bounds and physically valid.
+ * 
+ * @param params - The complete physics parameters object
+ * @returns A new params object with all values validated and constrained
+ * 
+ * @internal
+ */
 const validatePhysicsConstraints = (params: PhysicsParams): PhysicsParams => {
   const validated = { ...params };
   
@@ -70,6 +89,33 @@ const validatePhysicsConstraints = (params: PhysicsParams): PhysicsParams => {
   return validated;
 };
 
+/**
+ * Provider component for the double-slit experiment simulation context.
+ * Manages all simulation state including physics parameters, animation timing,
+ * and particle systems.
+ * 
+ * @param props - Component props
+ * @param props.children - Child components that will have access to simulation context
+ * 
+ * @example
+ * ```typescript
+ * function App() {
+ *   return (
+ *     <SimulationProvider>
+ *       <DoubleSlitExperiment />
+ *       <ControlPanel />
+ *     </SimulationProvider>
+ *   );
+ * }
+ * ```
+ * 
+ * @remarks
+ * This provider:
+ * - Validates all physics parameters to ensure physical validity
+ * - Manages simulation time with pause/resume capabilities
+ * - Handles particle generation and visibility
+ * - Provides reset functionality for the entire simulation
+ */
 export const SimulationProvider: React.FC<SimulationProviderProps> = ({ children }) => {
   const [params, setParamsRaw] = useState<PhysicsParams>(() => validatePhysicsConstraints({
     wavelength: 0.5,
@@ -129,7 +175,32 @@ export const SimulationProvider: React.FC<SimulationProviderProps> = ({ children
   );
 };
 
-// Custom hook to use the simulation context
+/**
+ * Main hook to access the simulation context.
+ * Provides access to all simulation state and control functions.
+ * 
+ * @returns The complete simulation context including:
+ *   - params: Current physics parameters
+ *   - setParams: Function to update parameters
+ *   - simulationTime: Current simulation time in seconds
+ *   - visibleParticles: Array of currently visible particles
+ *   - handleReset: Function to reset the simulation
+ * 
+ * @throws Error if used outside of SimulationProvider
+ * 
+ * @example
+ * ```typescript
+ * function MyComponent() {
+ *   const { params, setParams, simulationTime } = useSimulation();
+ *   
+ *   const handleWavelengthChange = (wavelength: number) => {
+ *     setParams(prev => ({ ...prev, wavelength }));
+ *   };
+ *   
+ *   return <div>Time: {simulationTime.toFixed(2)}s</div>;
+ * }
+ * ```
+ */
 export const useSimulation = (): SimulationContextType => {
   const context = useContext(SimulationContext);
   if (context === undefined) {
@@ -138,22 +209,68 @@ export const useSimulation = (): SimulationContextType => {
   return context;
 };
 
-// Granular hooks for specific parts of the context
+/**
+ * Hook to access only the physics parameters and their setter.
+ * Use when you only need parameter state, not other simulation data.
+ * 
+ * @returns Object containing params and setParams
+ * 
+ * @example
+ * ```typescript
+ * const { params, setParams } = useSimulationParams();
+ * ```
+ */
 export const useSimulationParams = () => {
   const { params, setParams } = useSimulation();
   return { params, setParams };
 };
 
+/**
+ * Hook to access only the simulation time.
+ * Use for components that need to animate based on time.
+ * 
+ * @returns Current simulation time in seconds
+ * 
+ * @example
+ * ```typescript
+ * const simulationTime = useSimulationTime();
+ * const phase = simulationTime * frequency;
+ * ```
+ */
 export const useSimulationTime = () => {
   const { simulationTime } = useSimulation();
   return simulationTime;
 };
 
+/**
+ * Hook to access only the visible particles array.
+ * Use for rendering particle visualizations.
+ * 
+ * @returns Array of currently visible particles
+ * 
+ * @example
+ * ```typescript
+ * const particles = useSimulationParticles();
+ * return <Particles data={particles} />;
+ * ```
+ */
 export const useSimulationParticles = () => {
   const { visibleParticles } = useSimulation();
   return visibleParticles;
 };
 
+/**
+ * Hook to access only the simulation control functions.
+ * Use for control UI components.
+ * 
+ * @returns Object containing control functions like handleReset
+ * 
+ * @example
+ * ```typescript
+ * const { handleReset } = useSimulationControls();
+ * <button onClick={handleReset}>Reset</button>
+ * ```
+ */
 export const useSimulationControls = () => {
   const { handleReset } = useSimulation();
   return { handleReset };

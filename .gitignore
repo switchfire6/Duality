@@ -25,3 +25,6 @@ dist-ssr
 
 # Windows file transfer artifacts
 *.Zone.Identifier
+
+# Test coverage
+coverage

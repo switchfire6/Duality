@@ -34,14 +34,64 @@ Where:
 - `λ` = wavelength of light
 - `θ` = angle from the central axis
 
+## Architecture
+
+### Component Structure
+
+The application follows a hierarchical component architecture:
+
+```
+App.tsx
+└── DoubleSlitExperiment.tsx (main state management)
+    ├── Scene.tsx (3D visualization container)
+    │   ├── WaveField (GPU-accelerated wave visualization)
+    │   ├── DetectionScreen (interference pattern display)
+    │   ├── Barrier (double slit geometry)
+    │   ├── Laser (coherent light source)
+    │   ├── FringeMarkers (measurement guides)
+    │   └── Particles (quantum particle visualization)
+    └── ControlPanel.tsx (parameter controls)
+```
+
+### State Management
+
+- **Centralized State**: All simulation parameters managed in `DoubleSlitExperiment.tsx`
+- **Immutable Updates**: React state with controlled updates for predictable behavior
+- **Props Drilling**: Simple prop passing for clear data flow
+- **Memoization**: Strategic use of `useMemo` for expensive calculations
+
+### Performance Optimizations
+
+1. **GPU Acceleration**: Heavy wave calculations offloaded to WebGL shaders
+2. **Efficient Rendering**: 
+   - BufferGeometry for particle systems
+   - Instanced rendering for multiple particles
+   - Conditional rendering based on visibility
+3. **Animation Optimization**:
+   - Custom animation loop with pausable time
+   - Staggered particle spawning to prevent frame drops
+   - Time-scaled animations independent of frame rate
+4. **Memory Management**:
+   - Proper cleanup of Three.js resources
+   - Limited particle count with object pooling
+   - Efficient texture and geometry reuse
+
+### Error Handling Strategy
+
+- **Graceful Degradation**: Falls back to simpler visualizations if WebGL unavailable
+- **Parameter Validation**: Input bounds checking prevents invalid physics states
+- **Resource Loading**: Handles shader compilation errors with informative messages
+- **State Recovery**: Maintains consistent state even after errors
+
 ## Technical Implementation
 
 Built with:
 - React 19 and TypeScript
-- Three.js for 3D graphics
+- Three.js for 3D graphics with @react-three/fiber
 - React Three Fiber for declarative 3D scene management
-- Custom GLSL shaders for wave field calculations
-- Vite for development and building
+- Custom GLSL shaders for GPU-accelerated wave field calculations
+- Vite for fast development and optimized builds
+- WebGL for high-performance rendering
 
 ## Installation
 
@@ -71,6 +121,17 @@ Production files will be in the `dist/` directory.
 3. **Near/far field**: Change screen distance to transition between Fresnel and Fraunhofer regimes
 4. **Particle accumulation**: Switch to particle mode to see statistical pattern emergence
 
+## Accessibility Features
+
+The application includes several accessibility enhancements:
+
+- **Keyboard Navigation**: All controls accessible via keyboard with visible focus indicators
+- **Screen Reader Support**: ARIA labels and live regions for dynamic content
+- **Color Accessibility**: High contrast UI with WCAG-compliant color ratios
+- **Reduced Motion**: Respects `prefers-reduced-motion` for users sensitive to animations
+- **Descriptive Labels**: Clear, informative labels for all interactive elements
+- **Status Announcements**: Live regions announce parameter changes and calculations
+
 ## Project Structure
 
 ```
@@ -85,6 +146,50 @@ src/
 ├── types.ts                       # TypeScript definitions
 └── App.tsx                        # Application entry
 ```
+
+## Development Guidelines
+
+### Code Organization Conventions
+
+- **Component Structure**: Each component in its own file with clear, single responsibility
+- **Type Definitions**: All interfaces and types centralized in `types.ts`
+- **Shader Code**: GLSL shaders isolated in dedicated modules with TypeScript wrappers
+- **Constants**: Physics constants and defaults defined at module level
+- **Naming**: Descriptive names following React conventions (PascalCase components, camelCase functions)
+
+### TypeScript Usage
+
+- **Strict Mode**: Full TypeScript strict mode enabled for type safety
+- **Interface First**: Define interfaces for all props and complex data structures
+- **Type Inference**: Leverage TypeScript's inference where possible, explicit where necessary
+- **No `any`**: Avoid `any` type; use `unknown` or proper types instead
+- **Generics**: Use generic types for reusable components and utilities
+
+### Performance Best Practices
+
+1. **React Optimization**:
+   - Use `React.memo` for expensive pure components
+   - Implement `useMemo` and `useCallback` for complex calculations
+   - Avoid inline function definitions in render
+   - Keep component trees shallow
+
+2. **Three.js Optimization**:
+   - Dispose of geometries, materials, and textures when unmounting
+   - Use `BufferGeometry` over `Geometry` for better performance
+   - Minimize draw calls with instanced rendering
+   - Cache geometries and materials when possible
+
+3. **Animation Performance**:
+   - Use `requestAnimationFrame` for smooth animations
+   - Batch DOM updates in animation loops
+   - Implement frame rate limiting for consistency
+   - Profile with Chrome DevTools for bottlenecks
+
+4. **Bundle Optimization**:
+   - Lazy load heavy dependencies when needed
+   - Use Vite's code splitting for optimal chunks
+   - Minimize shader code size with preprocessing
+   - Enable production optimizations in build
 
 ## Contributing
 
