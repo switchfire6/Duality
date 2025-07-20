@@ -1,13 +1,7 @@
 import React from 'react';
-import type { PhysicsParams } from '../types';
+import type { ControlPanelProps, SliderProps, CheckboxProps, PhysicsParams } from '../types/interfaces';
 
-interface ControlPanelProps {
-  params: PhysicsParams;
-  setParams: React.Dispatch<React.SetStateAction<PhysicsParams>>;
-  onReset: () => void;
-}
-
-const Slider = ({ label, value, min, max, step, onChange, unit = '', disabled = false }: { label: string; value: number; min: number; max: number; step: number; onChange: (e: React.ChangeEvent<HTMLInputElement>) => void; unit?: string; disabled?: boolean }) => (
+const Slider: React.FC<SliderProps> = ({ label, value, min, max, step, onChange, unit = '', disabled = false }) => (
   <div className="mb-4">
     <label className={`block text-sm font-medium mb-1 ${disabled ? 'text-gray-500' : 'text-gray-300'}`}>{label}: <span className={`font-mono ${disabled ? 'text-gray-500' : 'text-cyan-400'}`}>{value.toFixed(2)}{unit}</span></label>
     <input
@@ -23,7 +17,7 @@ const Slider = ({ label, value, min, max, step, onChange, unit = '', disabled = 
   </div>
 );
 
-const Checkbox = ({ label, checked, onChange }: { label: string; checked: boolean; onChange: (e: React.ChangeEvent<HTMLInputElement>) => void; }) => (
+const Checkbox: React.FC<CheckboxProps> = ({ label, checked, onChange }) => (
   <div className="flex items-center mb-4">
     <input
       type="checkbox"
