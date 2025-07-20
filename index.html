@@ -4,11 +4,66 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Interactive Double Slit Experiment</title>
+  <meta name="description" content="Interactive quantum physics visualization demonstrating wave-particle duality through the famous double-slit experiment" />
+  <title>Interactive Double Slit Experiment - Quantum Physics Visualization</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Screen reader only content */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border-width: 0;
+    }
+    
+    /* Skip to main content link */
+    .skip-link {
+      position: absolute;
+      top: -40px;
+      left: 0;
+      background: #06B6D4;
+      color: white;
+      padding: 8px 16px;
+      text-decoration: none;
+      border-radius: 0 0 4px 0;
+      z-index: 100;
+    }
+    
+    .skip-link:focus {
+      top: 0;
+    }
+    
+    /* Ensure focus indicators are visible */
+    *:focus {
+      outline: 2px solid #06B6D4;
+      outline-offset: 2px;
+    }
+    
+    /* High contrast mode support */
+    @media (prefers-contrast: high) {
+      .text-gray-300 { color: #f3f4f6; }
+      .text-gray-400 { color: #e5e7eb; }
+      .text-gray-500 { color: #d1d5db; }
+    }
+    
+    /* Reduced motion support */
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
 </head>
 <body class="bg-gray-900 overflow-hidden">
-  <div id="root"></div>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  <div id="root" role="application" aria-label="Double Slit Experiment Simulation"></div>
   <script type="module" src="/index.tsx"></script>
 </body>
 </html>

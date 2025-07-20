@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import type { BarrierProps } from '../../types/interfaces';
 
 const Barrier: React.FC<BarrierProps> = ({ slitSeparation, slitWidth }) => {
@@ -6,8 +6,11 @@ const Barrier: React.FC<BarrierProps> = ({ slitSeparation, slitWidth }) => {
   const barrierHeight = 2;
   const totalWidth = 12; // Total width along Z axis
 
-  const centerPieceWidth = slitSeparation - slitWidth;
-  const sidePieceCenterZ = (slitSeparation + slitWidth) / 2.0;
+  // Memoize calculations to avoid recalculation on every render
+  const { centerPieceWidth, sidePieceCenterZ } = useMemo(() => ({
+    centerPieceWidth: slitSeparation - slitWidth,
+    sidePieceCenterZ: (slitSeparation + slitWidth) / 2.0
+  }), [slitSeparation, slitWidth]);
 
   return (
     <group position={[0, 0, 0]}>
@@ -31,4 +34,10 @@ const Barrier: React.FC<BarrierProps> = ({ slitSeparation, slitWidth }) => {
   );
 };
 
-export default Barrier;
+// Custom comparison function - only re-render if slitSeparation or slitWidth change
+const arePropsEqual = (prevProps: BarrierProps, nextProps: BarrierProps) => {
+  return prevProps.slitSeparation === nextProps.slitSeparation &&
+         prevProps.slitWidth === nextProps.slitWidth;
+};
+
+export default React.memo(Barrier, arePropsEqual);

@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Grid } from '@react-three/drei';
 import * as THREE from 'three';
@@ -13,7 +13,11 @@ import Particles from './3d/Particles';
 
 const SceneComponent: React.FC<SceneComponentProps> = ({ params, particles, simulationTime }) => {
   return (
-    <Canvas camera={{ position: [-7, 4, 0], fov: 60 }}>
+    <Canvas 
+      camera={{ position: [-7, 4, 0], fov: 60 }}
+      gl={{ preserveDrawingBuffer: true }}
+      aria-label="3D visualization canvas"
+    >
       <ambientLight intensity={0.2} />
       <pointLight position={[0, 5, 0]} intensity={1.0} />
       
@@ -34,10 +38,10 @@ const SceneComponent: React.FC<SceneComponentProps> = ({ params, particles, simu
         args={[30, 30]}
         cellSize={1}
         cellThickness={1}
-        cellColor={new THREE.Color('#666666')}
+        cellColor={useMemo(() => new THREE.Color('#666666'), [])}
         sectionSize={5}
         sectionThickness={1.5}
-        sectionColor={new THREE.Color('#aaaaaa')}
+        sectionColor={useMemo(() => new THREE.Color('#aaaaaa'), [])}
         fadeDistance={40}
         infiniteGrid
       />

@@ -7,6 +7,9 @@ const DetectionScreen: React.FC<DetectionScreenProps> = ({ params }) => {
   const materialRef = useRef<THREE.ShaderMaterial>(null);
   const PLANE_WIDTH_Z = 12;
   const PLANE_HEIGHT_Y = 2;
+  
+  // Memoize shader key to prevent unnecessary re-renders
+  const shaderKey = useMemo(() => detectionScreenVertexShader + detectionScreenFragmentShader, []);
 
   const uniforms = useMemo<DetectionScreenUniforms>(() => ({
     uWavelength: { value: params.wavelength },
@@ -14,7 +17,7 @@ const DetectionScreen: React.FC<DetectionScreenProps> = ({ params }) => {
     uScreenDistance: { value: params.screenDistance },
     uSlitWidth: { value: params.slitWidth },
     uMaxWidth: { value: PLANE_WIDTH_Z },
-  }), []); 
+  }), []); // Empty deps is correct - we update values via refs in useEffect 
 
   useEffect(() => {
     if (materialRef.current) {
@@ -31,7 +34,7 @@ const DetectionScreen: React.FC<DetectionScreenProps> = ({ params }) => {
       <planeGeometry args={[PLANE_WIDTH_Z, PLANE_HEIGHT_Y, 200, 1]} />
       <shaderMaterial
         ref={materialRef}
-        key={detectionScreenVertexShader + detectionScreenFragmentShader}
+        key={shaderKey}
         vertexShader={detectionScreenVertexShader}
         fragmentShader={detectionScreenFragmentShader}
         uniforms={uniforms}

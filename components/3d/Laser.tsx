@@ -14,4 +14,5 @@ const Laser: React.FC = () => (
   </group>
 );
 
-export default Laser;
+// Laser is a static component that never needs to re-render
+export default React.memo(Laser);

@@ -23,4 +23,11 @@ const FringeMarkers: React.FC<FringeMarkersProps> = ({ params }) => {
   return <group>{markers}</group>;
 };
 
-export default FringeMarkers;
+// Custom comparison function - only re-render if relevant physics params change
+const arePropsEqual = (prevProps: FringeMarkersProps, nextProps: FringeMarkersProps) => {
+  return prevProps.params.wavelength === nextProps.params.wavelength &&
+         prevProps.params.slitSeparation === nextProps.params.slitSeparation &&
+         prevProps.params.screenDistance === nextProps.params.screenDistance;
+};
+
+export default React.memo(FringeMarkers, arePropsEqual);

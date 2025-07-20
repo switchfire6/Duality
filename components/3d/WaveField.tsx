@@ -5,6 +5,9 @@ import { waveFieldVertexShader, waveFieldFragmentShader } from '../../shaders/Wa
 
 const WaveField: React.FC<WaveFieldProps> = ({ params, simulationTime }) => {
   const materialRef = useRef<THREE.ShaderMaterial>(null);
+  
+  // Memoize shader key to prevent unnecessary re-renders
+  const shaderKey = useMemo(() => waveFieldVertexShader + waveFieldFragmentShader, []);
 
   const uniforms = useMemo<WaveFieldUniforms>(() => ({
     uTime: { value: 0.0 },
@@ -13,7 +16,7 @@ const WaveField: React.FC<WaveFieldProps> = ({ params, simulationTime }) => {
     uAmplitude: { value: params.amplitude },
     uSlitWidth: { value: params.slitWidth },
     uWaveSpeed: { value: params.waveSpeed },
-  }), []);
+  }), []); // Empty deps is correct - we update values via refs in useEffect
   
   useEffect(() => {
     if (materialRef.current) {
@@ -38,7 +41,7 @@ const WaveField: React.FC<WaveFieldProps> = ({ params, simulationTime }) => {
       <planeGeometry args={[15, 12, 200, 200]} />
       <shaderMaterial
         ref={materialRef}
-        key={waveFieldVertexShader + waveFieldFragmentShader}
+        key={shaderKey}
         vertexShader={waveFieldVertexShader}
         fragmentShader={waveFieldFragmentShader}
         uniforms={uniforms}

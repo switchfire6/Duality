@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import type { PhysicsParams, Particle, ParticleGenerationConfig } from '../types/interfaces';
 
 interface ParticleSystemState {
@@ -135,24 +135,21 @@ export function useParticleSystem(
     resetParticles
   ]);
 
+  // Memoize the filtering of visible particles
+  const shouldBeVisibleParticles = useMemo(() => {
+    if (!params.particleMode) return [];
+    const currentTime = isUsingExternalTime ? simulationTime : internalSimTime;
+    return allParticles.filter(p => p.startTime <= currentTime);
+  }, [params.particleMode, isUsingExternalTime, simulationTime, internalSimTime, allParticles]);
+
   // Effect for staggered appearance of particles based on simulation time
   useEffect(() => {
     if (!params.particleMode) return;
-
-    const currentTime = isUsingExternalTime ? simulationTime : internalSimTime;
-    const shouldBeVisible = allParticles.filter(p => p.startTime <= currentTime);
     
-    if (shouldBeVisible.length > visibleParticles.length) {
-      setVisibleParticles(shouldBeVisible);
+    if (shouldBeVisibleParticles.length > visibleParticles.length) {
+      setVisibleParticles(shouldBeVisibleParticles);
     }
-  }, [
-    simulationTime,
-    internalSimTime,
-    params.particleMode,
-    allParticles,
-    visibleParticles.length,
-    isUsingExternalTime
-  ]);
+  }, [params.particleMode, shouldBeVisibleParticles, visibleParticles.length]);
 
   // Optional: Update particle positions based on physics (if particles move over time)
   // Currently particles are static once placed on the detection screen
