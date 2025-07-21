@@ -7,6 +7,15 @@
   <meta name="description" content="Interactive quantum physics visualization demonstrating wave-particle duality through the famous double-slit experiment" />
   <title>Interactive Double Slit Experiment - Quantum Physics Visualization</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    // Handle redirect from 404.html for GitHub Pages SPA support
+    (function() {
+      const redirect = new URLSearchParams(window.location.search).get('redirect');
+      if (redirect) {
+        window.history.replaceState(null, null, redirect);
+      }
+    })();
+  </script>
   <style>
     /* Screen reader only content */
     .sr-only {

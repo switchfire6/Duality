@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Page Not Found</title>
+  <script>
+    // Single Page App support for GitHub Pages
+    // Redirect all 404s to index.html with the path as a query parameter
+    const path = window.location.pathname;
+    window.location.replace(
+      window.location.origin + '/Duality/' + '?redirect=' + path
+    );
+  </script>
+</head>
+<body>
+  <p>Redirecting...</p>
+</body>
+</html>
